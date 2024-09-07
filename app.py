@@ -1,12 +1,28 @@
 import streamlit as st
 import torch
+import torchvision.models as models
 from torchvision import transforms
 from PIL import Image
 import numpy as np
 
+# Define the model architecture
+# This is an example using ResNet18. Adjust this to match your actual model architecture
+def get_model():
+    model = models.resnet18(pretrained=False)
+    num_ftrs = model.fc.in_features
+    model.fc = torch.nn.Linear(num_ftrs, len(class_names))  # Adjust the number of output classes
+    return model
+
 # Load your PyTorch model
-model = torch.load('model.pth', map_location=torch.device('cpu'))
-model.eval()  # Set the model to evaluation mode
+@st.cache_resource
+def load_model():
+    model = get_model()
+    state_dict = torch.load('model.pth', map_location=torch.device('cpu'))
+    model.load_state_dict(state_dict)
+    model.eval()  # Set the model to evaluation mode
+    return model
+
+model = load_model()
 
 # Define your class names (adjust based on your model's classes)
 class_names = ['Disease 1', 'Disease 2', 'Disease 3', 'Healthy']
