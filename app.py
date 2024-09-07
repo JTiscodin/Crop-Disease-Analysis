@@ -6,7 +6,7 @@ from PIL import Image
 import numpy as np
 
 # Define your class names (adjust based on your model's classes)
-class_names = ['Disease 1', 'Disease 2', 'Disease 3', 'Healthy']
+class_names = ['Disease 1', 'Disease 2', 'Disease 3', ..., 'Disease 38']  # Fill in all 38 class names
 
 class CustomModel(nn.Module):
     def __init__(self):
@@ -22,11 +22,15 @@ class CustomModel(nn.Module):
             nn.ReLU(inplace=True)
         )
         self.res1 = nn.Sequential(
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128)
+            nn.Sequential(
+                nn.Conv2d(128, 128, kernel_size=3, padding=1),
+                nn.BatchNorm2d(128),
+                nn.ReLU(inplace=True)
+            ),
+            nn.Sequential(
+                nn.Conv2d(128, 128, kernel_size=3, padding=1),
+                nn.BatchNorm2d(128)
+            )
         )
         self.conv3 = nn.Sequential(
             nn.Conv2d(128, 256, kernel_size=3, padding=1),
@@ -39,16 +43,20 @@ class CustomModel(nn.Module):
             nn.ReLU(inplace=True)
         )
         self.res2 = nn.Sequential(
-            nn.Conv2d(512, 512, kernel_size=3, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(512, 512, kernel_size=3, padding=1),
-            nn.BatchNorm2d(512)
+            nn.Sequential(
+                nn.Conv2d(512, 512, kernel_size=3, padding=1),
+                nn.BatchNorm2d(512),
+                nn.ReLU(inplace=True)
+            ),
+            nn.Sequential(
+                nn.Conv2d(512, 512, kernel_size=3, padding=1),
+                nn.BatchNorm2d(512)
+            )
         )
         self.classifier = nn.Sequential(
             nn.AdaptiveAvgPool2d((1,1)),
             nn.Flatten(),
-            nn.Linear(512, len(class_names))
+            nn.Linear(512, 38)  # Changed to 38 output classes
         )
 
     def forward(self, x):
@@ -72,6 +80,8 @@ def load_model():
 
 model = load_model()
 
+# ... rest of the code remains the same ...
+
 def preprocess_image(image):
     preprocess = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -94,8 +104,8 @@ def get_treatment(disease):
     treatments = {
         'Disease 1': 'Treatment for Disease 1...',
         'Disease 2': 'Treatment for Disease 2...',
-        'Disease 3': 'Treatment for Disease 3...',
-        'Healthy': 'No treatment needed. The crop appears healthy.'
+        # ... add treatments for all 38 diseases ...
+        'Disease 38': 'Treatment for Disease 38...'
     }
     return treatments.get(disease, 'Unknown disease. Please consult an expert.')
 
