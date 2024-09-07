@@ -5,8 +5,10 @@ from torchvision import transforms
 from PIL import Image
 import numpy as np
 
+# Define your class names (adjust based on your model's classes)
+class_names = ['Disease 1', 'Disease 2', 'Disease 3', 'Healthy']
+
 # Define the model architecture
-# This is an example using ResNet18. Adjust this to match your actual model architecture
 def get_model():
     model = models.resnet18(pretrained=False)
     num_ftrs = model.fc.in_features
@@ -23,9 +25,6 @@ def load_model():
     return model
 
 model = load_model()
-
-# Define your class names (adjust based on your model's classes)
-class_names = ['Disease 1', 'Disease 2', 'Disease 3', 'Healthy']
 
 def preprocess_image(image):
     # Define the same transforms used during training
