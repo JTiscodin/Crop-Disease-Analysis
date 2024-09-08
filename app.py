@@ -91,11 +91,15 @@ def predict_disease(image):
     with torch.no_grad():
         preprocessed_img = preprocess_image(image)
         outputs = model(preprocessed_img)
-        _, predicted = torch.max(outputs, 1)
         probabilities = torch.nn.functional.softmax(outputs, dim=1)
-        confidence = torch.max(probabilities).item()
+        confidence, predicted = torch.max(probabilities, 1)
         predicted_class = class_names[predicted.item()]
-    return predicted_class, confidence
+        
+        # Debug: Print all class probabilities
+        for i, prob in enumerate(probabilities[0]):
+            st.write(f"{class_names[i]}: {prob.item():.4f}")
+        
+    return predicted_class, confidence.item()
 
 st.title('Crop Disease Prediction')
 
@@ -109,3 +113,9 @@ if uploaded_file is not None:
         predicted_disease, confidence = predict_disease(image)
         st.write(f"Predicted Disease: {predicted_disease}")
         st.write(f"Confidence: {confidence:.2f}")
+
+        # Debug: Print model output
+        st.write("Model Output:")
+        with torch.no_grad():
+            outputs = model(preprocess_image(image))
+            st.write(outputs)
