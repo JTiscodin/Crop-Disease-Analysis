@@ -5,8 +5,8 @@ from torchvision import transforms
 from PIL import Image
 import numpy as np
 
-# Define your class names (adjust based on your model's classes)
-class_names = ['Disease 1', 'Disease 2', 'Disease 3', ..., 'Disease 38']  # Fill in all 38 class names
+class_names = ['Tomato__Late_blight', 'Tomato_healthy', 'Grape_healthy', 'Orange_Haunglongbing(Citrus_greening)', 'Soybean__healthy', 'Squash_Powdery_mildew', 'Potato_healthy', 'Corn(maize)Northern_Leaf_Blight', 'Tomato_Early_blight', 'Tomato_Septoria_leaf_spot', 'Corn(maize)Cercospora_leaf_spot Gray_leaf_spot', 'Strawberry_Leaf_scorch', 'Peach_healthy', 'Apple_Apple_scab', 'Tomato_Tomato_Yellow_Leaf_Curl_Virus', 'Tomato_Bacterial_spot', 'Apple_Black_rot', 'Blueberry_healthy', 'Cherry(including_sour)Powdery_mildew', 'Peach_Bacterial_spot', 'Apple_Cedar_apple_rust', 'Tomato_Target_Spot', 'Pepper,_bell_healthy', 'Grape_Leaf_blight(Isariopsis_Leaf_Spot)', 'Potato__Late_blight', 'Tomato_Tomato_mosaic_virus', 'Strawberry_healthy', 'Apple_healthy', 'Grape_Black_rot', 'Potato_Early_blight', 'Cherry(including_sour)healthy', 'Corn(maize)Common_rust', 'Grape__Esca(Black_Measles)', 'Raspberry__healthy', 'Tomato_Leaf_Mold', 'Tomato_Spider_mites Two-spotted_spider_mite', 'Pepper,_bell_Bacterial_spot', 'Corn(maize)_healthy']
+
 
 class CustomModel(nn.Module):
     def __init__(self):
@@ -56,7 +56,7 @@ class CustomModel(nn.Module):
         self.classifier = nn.Sequential(
             nn.AdaptiveAvgPool2d((1,1)),
             nn.Flatten(),
-            nn.Linear(512, 38)  # Changed to 38 output classes
+            nn.Linear(512, 38)
         )
 
     def forward(self, x):
@@ -69,18 +69,15 @@ class CustomModel(nn.Module):
         x = self.classifier(x)
         return x
 
-# Load your PyTorch model
 @st.cache_resource
 def load_model():
     model = CustomModel()
     state_dict = torch.load('model.pth', map_location=torch.device('cpu'))
     model.load_state_dict(state_dict)
-    model.eval()  # Set the model to evaluation mode
+    model.eval()
     return model
 
 model = load_model()
-
-# ... rest of the code remains the same ...
 
 def preprocess_image(image):
     preprocess = transforms.Compose([
@@ -100,15 +97,6 @@ def predict_disease(image):
         predicted_class = class_names[predicted.item()]
     return predicted_class, confidence
 
-def get_treatment(disease):
-    treatments = {
-        'Disease 1': 'Treatment for Disease 1...',
-        'Disease 2': 'Treatment for Disease 2...',
-        # ... add treatments for all 38 diseases ...
-        'Disease 38': 'Treatment for Disease 38...'
-    }
-    return treatments.get(disease, 'Unknown disease. Please consult an expert.')
-
 st.title('Crop Disease Prediction')
 
 uploaded_file = st.file_uploader("Choose an image of the crop", type=["jpg", "jpeg", "png"])
@@ -121,7 +109,3 @@ if uploaded_file is not None:
         predicted_disease, confidence = predict_disease(image)
         st.write(f"Predicted Disease: {predicted_disease}")
         st.write(f"Confidence: {confidence:.2f}")
-        
-        treatment = get_treatment(predicted_disease)
-        st.write("Recommended Action:")
-        st.write(treatment)
